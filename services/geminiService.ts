@@ -92,7 +92,7 @@ export const generateRecipeFromIngredients = async (
     prompt += ` ${langInstruction}`;
 
     const model = ai.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       systemInstruction: `You are a world-class nutritionist and chef designed to help women cook healthy meals easily. 
         Provide 2-3 helpful tips (substitutions, nutritional benefits) in the 'tips' field.
         If the cuisine is Central Asian (Uzbek, Tajik, etc.), suggest an adapted healthier version if traditional versions are too heavy, 
@@ -129,7 +129,7 @@ export const generateDishImage = async (title: string, ingredients: string[]): P
     The dish MUST visibly contain these ingredients: ${ingredients.join(', ')}.
     High resolution, appetizing, soft lighting, 4k, overhead or 45-degree angle view, restaurant quality.`;
 
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-pro' });
     
     const response = await model.generateContent([
       prompt
@@ -174,7 +174,7 @@ export const identifyPantryItem = async (base64Image: string, language: Language
     Categorize into: produce, dairy, protein, pantry, other.
     ${language === 'ru' ? 'Return the name in Russian.' : 'Return the name in English.'}`;
 
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-pro' });
     
     const response = await model.generateContent({
       contents: [{
@@ -211,7 +211,7 @@ export const streamChatResponse = async function* (
     const langInstruction = language === 'ru' ? 'Respond in Russian.' : 'Respond in English.';
     
     const model = ai.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       systemInstruction: `You are a friendly, supportive AI Chef and Nutritionist for a women's health app. Keep answers concise, encouraging, and helpful. You help with ingredient substitutions, cooking tips, and quick healthy snack ideas. ${langInstruction}`
     });
     
