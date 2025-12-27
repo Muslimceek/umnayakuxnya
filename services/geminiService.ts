@@ -2,7 +2,7 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { GeneratedRecipe, Language, PantryItemAnalysis } from "../types";
 
 // Initialize Gemini Client
-const ai = new GoogleGenerativeAI(process.env.API_KEY || '');
+const ai = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || '');
 
 const RECIPE_SCHEMA = {
   type: SchemaType.OBJECT,
@@ -50,7 +50,7 @@ export const generateRecipeFromIngredients = async (
   language: Language,
   filters?: { cuisine?: string, mealType?: string, mood?: string }
 ): Promise<GeneratedRecipe | null> => {
-  if (!process.env.API_KEY) {
+  if (!process.env.VITE_GEMINI_API_KEY) {
     console.error("API Key missing");
     // Return mock for demo if no key
     return {
@@ -92,7 +92,7 @@ export const generateRecipeFromIngredients = async (
     prompt += ` ${langInstruction}`;
 
     const model = ai.getGenerativeModel({ 
-      model: 'gemini-pro',
+      model: 'gemini-1.5-flash',
       systemInstruction: `You are a world-class nutritionist and chef designed to help women cook healthy meals easily. 
         Provide 2-3 helpful tips (substitutions, nutritional benefits) in the 'tips' field.
         If the cuisine is Central Asian (Uzbek, Tajik, etc.), suggest an adapted healthier version if traditional versions are too heavy, 
@@ -122,14 +122,14 @@ export const generateRecipeFromIngredients = async (
 };
 
 export const generateDishImage = async (title: string, ingredients: string[]): Promise<string | null> => {
-  if (!process.env.API_KEY) return null;
+  if (!process.env.VITE_GEMINI_API_KEY) return null;
 
   try {
     const prompt = `A professional food photography shot of a dish called "${title}". 
     The dish MUST visibly contain these ingredients: ${ingredients.join(', ')}.
     High resolution, appetizing, soft lighting, 4k, overhead or 45-degree angle view, restaurant quality.`;
 
-    const model = ai.getGenerativeModel({ model: 'gemini-pro' });
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
     
     const response = await model.generateContent([
       prompt
@@ -153,7 +153,7 @@ export const generateDishImage = async (title: string, ingredients: string[]): P
 };
 
 export const identifyPantryItem = async (base64Image: string, language: Language): Promise<PantryItemAnalysis | null> => {
-  if (!process.env.API_KEY) return null;
+  if (!process.env.VITE_GEMINI_API_KEY) return null;
 
   try {
     // Remove data URL prefix if present for API consumption
@@ -174,7 +174,7 @@ export const identifyPantryItem = async (base64Image: string, language: Language
     Categorize into: produce, dairy, protein, pantry, other.
     ${language === 'ru' ? 'Return the name in Russian.' : 'Return the name in English.'}`;
 
-    const model = ai.getGenerativeModel({ model: 'gemini-pro' });
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
     
     const response = await model.generateContent({
       contents: [{
@@ -202,7 +202,7 @@ export const streamChatResponse = async function* (
   newMessage: string,
   language: Language
 ) {
-  if (!process.env.API_KEY) {
+  if (!process.env.VITE_GEMINI_API_KEY) {
     yield "I'm sorry, I cannot connect to the AI service right now (Missing API Key).";
     return;
   }
@@ -211,7 +211,7 @@ export const streamChatResponse = async function* (
     const langInstruction = language === 'ru' ? 'Respond in Russian.' : 'Respond in English.';
     
     const model = ai.getGenerativeModel({
-      model: 'gemini-pro',
+      model: 'gemini-1.5-flash',
       systemInstruction: `You are a friendly, supportive AI Chef and Nutritionist for a women's health app. Keep answers concise, encouraging, and helpful. You help with ingredient substitutions, cooking tips, and quick healthy snack ideas. ${langInstruction}`
     });
     
